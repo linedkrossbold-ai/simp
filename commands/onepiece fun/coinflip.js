@@ -31,22 +31,27 @@ module.exports = {
       // Require the target to confirm the challenge by replying 'yes'
       // Send a challenge embed
       const challengeEmbed = new EmbedBuilder()
-        .setColor('#FFD700')
+          .setColor('#E8C547')
         .setTitle('🪙 Coinflip Challenge')
-        .addFields(
-          { name: 'Challenger', value: `${message.author.tag}`, inline: true },
-          { name: 'Target', value: `${target.user.tag}`, inline: true },
-          { name: 'Amount', value: `${amount}`, inline: true },
-          { name: 'Status', value: 'Pending - reply with `accept` to accept or `deny` to decline', inline: false }
-        )
+          .setDescription(`${message.author} challenged ${target} to a duel!\n\n**Bet:** ${amount.toLocaleString()} coins\n**Win chance:** 50% each`)
+          .addFields({ name: 'Will you accept?', value: `Reply directly to this message with \`accept\` or \`deny\`.` })
+          .setFooter({ text: 'Only the challenged member can answer this duel.' })
         .setTimestamp();
 
-      await message.reply({ embeds: [challengeEmbed] }).catch(() => null);
+        const challengeMessage = await message.reply({ embeds: [challengeEmbed] }).catch(() => null);
+        if (!challengeMessage) return null;
 
       // Wait for response from target
       let confirmMsg = null;
       try {
-        const collected = await message.channel.awaitMessages({ filter: (m) => m.author.id === target.id && /^(?:accept|deny)$/i.test(m.content), max: 1, time: 30000, errors: ['time'] });
+          const collected = await message.channel.awaitMessages({
+            filter: (m) => m.author.id === target.id
+              && m.reference?.messageId === challengeMessage.id
+              && /^(?:accept|deny)$/i.test(m.content.trim()),
+            max: 1,
+            time: 30000,
+            errors: ['time']
+          });
         const response = collected.first().content.trim().toLowerCase();
         if (/^deny$/.test(response)) {
           return message.reply(`${target.user.tag} declined the coinflip.`);
