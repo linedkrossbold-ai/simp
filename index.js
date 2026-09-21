@@ -13,7 +13,6 @@ const { specialStutterReplies, specialStutterImphdReplies, imphdMentionReplies, 
 const { isWatchedUser } = require('./utils/pingWatch');
 const { saveEconomySnapshotToFile } = require('./utils/economySnapshot');
 const { resolveDiscordToken } = require('./utils/discordToken');
-const { generateAiReply } = require('./utils/aiChat');
 const { buildApplicationCommand } = require('./utils/applicationCommands');
 const { getHelpCategory } = require('./utils/helpMenus');
 const { validateBotSafetyConfig, getProtectedGuildIds } = require('./utils/safety');
