@@ -10,7 +10,6 @@ const attachment = (name = 'image', description = 'Image file', required = false
 
 const schemas = {
   adminusage: [],
-  chat: [text('message', 'Message to send to the AI chatbot', true)],
   entry: [text('message', 'Announcement text', false), confirm('fast', 'Skip the dramatic preparation', false), confirm('confetti', 'Add confetti', false), integer('autodelete', 'Delete the announcement after this many seconds', false, 0, 3600)],
   execute: [user('user', 'Member to put to a vote')],
   roast: [user('user', 'Member to roast', false)],
@@ -27,7 +26,7 @@ const schemas = {
   givecoin: [user('user', 'Member receiving coins'), integer('amount', 'Coin amount', true, 1, 500)],
   givecontainers: [user('user', 'Member receiving containers'), integer('amount', 'Container amount', true, 1)],
   hazard: [user('user', 'Member to give the Hazardous role')],
-  grantaccess: [user('user', 'Member receiving access'), text('commands', 'Command names separated by commas, or all')],
+  grantaccess: [user('user', 'Member receiving access'), text('commands', 'setnick, execute, or say')],
   kick: [user('user', 'Member to kick'), text('reason', 'Reason for the kick', false)],
   leaveserver: [text('guild_id', 'ID of the server to leave'), confirm()],
   lockchannel: [choice('action', 'Channel action', ['lock', 'unlock', 'status']), channel('channel', 'Channel to manage')],

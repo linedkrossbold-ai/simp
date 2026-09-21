@@ -248,15 +248,18 @@ async function authorizeOwnerCommand(message, { commandName, requiredPermissions
     return true;
   }
 
-  if (!isTrueOwner(userId)) {
-    if (isTrustedUser(userId)) {
-      return false;
-    }
-    return false;
-  }
-
   if (await isTempAccessGranted(userId, commandName)) {
     return true;
+  }
+
+  if (!isTrueOwner(userId)) {
+    if (!message.guild) {
+      await message.reply('❌ This command can only be used in a server.').catch(() => {});
+      return false;
+    }
+
+    await requestOwnerAccess(message, { commandName, requiredPermissions });
+    return false;
   }
 
   if (!message.guild) {

@@ -9,6 +9,8 @@ function normalizeCommandName(value) {
   return normalized || null;
 }
 
+const GRANTABLE_COMMANDS = new Set(['setnick', 'execute', 'say']);
+
 function getAllCommandAccessNames(startDir = path.join(__dirname, '..', '..', 'commands'), names = new Set()) {
   const entries = fs.readdirSync(startDir, { withFileTypes: true });
 
@@ -75,29 +77,21 @@ module.exports = {
       return message.reply('❌ Usage: `~grantaccess @user [command1] [command2] [command3...] | all`');
     }
 
-    if (requestedCommands.length === 1 && requestedCommands[0] === 'all') {
-      const allCommandNames = getAllCommandAccessNames();
-      const grantedCount = await grantAllTempAccess(target.id, allCommandNames);
-      const embed = new EmbedBuilder()
-        .setColor('#43A047')
-        .setTitle('✅ Access Granted')
-        .setDescription(grantedCount > 0
-          ? `Approved access for ${target} has been granted for every loaded command and alias.`
-          : `Approved access for ${target} already exists for every loaded command and alias.`)
-        .setTimestamp();
-
-      return message.reply({ embeds: [embed] });
-    }
-
     const uniqueCommands = [...new Set(requestedCommands.filter((value) => value !== 'all'))];
     if (uniqueCommands.length === 0) {
       return message.reply('❌ Usage: `~grantaccess @user [command1] [command2] [command3...] | all`');
     }
 
+    const unsupportedCommands = uniqueCommands.filter((commandName) => !GRANTABLE_COMMANDS.has(commandName));
+    const grantCommands = uniqueCommands.filter((commandName) => GRANTABLE_COMMANDS.has(commandName));
+    if (grantCommands.length === 0) {
+      return message.reply('❌ Access can only be granted for `setnick`, `execute`, or `say`.');
+    }
+
     const grantedNow = [];
     const alreadyGranted = [];
 
-    for (const commandName of uniqueCommands) {
+    for (const commandName of grantCommands) {
       const wasAlreadyGranted = await isTempAccessGranted(target.id, commandName);
       await grantTempAccess(target.id, commandName);
       if (wasAlreadyGranted) {
@@ -113,9 +107,10 @@ module.exports = {
       .setDescription(
         grantedNow.length > 0 || alreadyGranted.length > 0
           ? [
-              `Approved access for ${target} has been updated.`,
+              `Approved access for ${target} has been updated for the permitted commands.`,
               grantedNow.length > 0 ? `Granted: ${grantedNow.map((commandName) => `\`${commandName}\``).join(', ')}.` : null,
-              alreadyGranted.length > 0 ? `Already existed: ${alreadyGranted.map((commandName) => `\`${commandName}\``).join(', ')}.` : null
+              alreadyGranted.length > 0 ? `Already existed: ${alreadyGranted.map((commandName) => `\`${commandName}\``).join(', ')}.` : null,
+              unsupportedCommands.length > 0 ? `Ignored: ${unsupportedCommands.map((commandName) => `\`${commandName}\``).join(', ')}.` : null
             ].filter(Boolean).join(' ')
           : `No valid command names were provided for ${target}.`
       )

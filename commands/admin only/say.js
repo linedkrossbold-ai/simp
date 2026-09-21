@@ -1,4 +1,5 @@
 const { SlashCommandBuilder, ChannelType, PermissionFlagsBits } = require('discord.js');
+const { authorizeOwnerCommand } = require('../../utils/owner');
 
 function resolveChannel(message, value) {
   const channelId = String(value || '').match(/^<#(\d+)>$/)?.[1] || String(value || '').trim();
@@ -40,6 +41,10 @@ module.exports = {
       .setRequired(true)),
 
   async execute(target, args = []) {
+    if (target.author && !(await authorizeOwnerCommand(target, { commandName: 'say', requiredPermissions: [PermissionFlagsBits.ManageMessages] }))) {
+      return;
+    }
+
     if (target?.isChatInputCommand?.()) {
       const content = target.options.getString('content');
       const channel = target.options.getChannel('channel');

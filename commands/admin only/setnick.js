@@ -2,6 +2,7 @@ const { EmbedBuilder } = require('discord.js');
 const { setLockedNickname } = require('../../database');
 const { PermissionFlagsBits } = require('discord.js');
 const { isProtectedNicknameTarget } = require('../../utils/protectedNicknames');
+const { authorizeOwnerCommand } = require('../../utils/owner');
 
 module.exports = {
   name: 'setnick',
@@ -10,6 +11,10 @@ module.exports = {
   requiredPermissions: [PermissionFlagsBits.ManageNicknames],
 
   async execute(message, args) {
+    if (!(await authorizeOwnerCommand(message, { commandName: 'setnick', requiredPermissions: [PermissionFlagsBits.ManageNicknames] }))) {
+      return;
+    }
+
     if (!message.guild) {
       return message.reply('❌ This command must be used in a server.');
     }
