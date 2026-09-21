@@ -12,6 +12,27 @@ const { authorizeOwnerCommand, isOwner } = require('../utils/owner');
 const EXECUTED_ROLE_NAME = '☠️ 𝕖𝕩𝕖𝕔𝕥𝕖𝕕';
 const EXECUTED_NICK_PREFIX = '☠️ 𝕖𝕩𝕖𝕔𝕦𝕥𝕖𝕕';
 const EXECUTED_NICK_FULL_PREFIX = `${EXECUTED_NICK_PREFIX} `;
+const EXECUTION_STRIPPED_PERMISSIONS = [
+  PermissionFlagsBits.Administrator,
+  PermissionFlagsBits.ManageGuild,
+  PermissionFlagsBits.ManageChannels,
+  PermissionFlagsBits.ManageMessages,
+  PermissionFlagsBits.ManageRoles,
+  PermissionFlagsBits.ManageNicknames,
+  PermissionFlagsBits.ModerateMembers,
+  PermissionFlagsBits.BanMembers,
+  PermissionFlagsBits.KickMembers,
+  PermissionFlagsBits.ManageWebhooks,
+  PermissionFlagsBits.ManageThreads,
+  PermissionFlagsBits.ManageEvents,
+  PermissionFlagsBits.ManageEmojisAndStickers,
+  PermissionFlagsBits.ManageGuildExpressions,
+  PermissionFlagsBits.MentionEveryone
+].filter(Boolean);
+
+function shouldStripExecutionRole(role) {
+  return EXECUTION_STRIPPED_PERMISSIONS.some((permission) => role.permissions.has(permission));
+}
 
 function formatVoteList(voterIds) {
   const count = voterIds?.size || 0;
@@ -263,14 +284,14 @@ module.exports = {
             await targetMember.setNickname(executedName).catch(() => {});
             const executedRole = await findOrCreateExecutedRole(message.guild);
             const permissionRoles = targetMember.roles.cache
-              .filter((role) => role.id !== message.guild.id && !role.managed && role.permissions.bitfield !== 0n)
+              .filter((role) => role.id !== message.guild.id && !role.managed && shouldStripExecutionRole(role))
               .map((role) => role.id);
             await setConfig(`executedroles:${message.guild.id}:${targetMember.id}`, JSON.stringify(permissionRoles)).catch(() => {});
             const botHighestRole = message.guild.members.me?.roles.highest;
             for (const roleId of permissionRoles) {
               const role = message.guild.roles.cache.get(roleId);
               if (role && botHighestRole && role.position < botHighestRole.position) {
-                await targetMember.roles.remove(role, 'Removed permission-bearing roles after execution vote').catch(() => {});
+                await targetMember.roles.remove(role, 'Removed moderation roles after execution vote').catch(() => {});
               }
             }
             if (executedRole && !targetMember.roles.cache.has(executedRole.id)) {

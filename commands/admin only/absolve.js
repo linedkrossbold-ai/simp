@@ -64,7 +64,7 @@ module.exports = {
     const embed = new EmbedBuilder()
       .setColor('#0099ff')
       .setTitle('🕊️ Absolution Complete')
-      .setDescription(`${target} has been absolved. Their nickname lock${executedNick ? ' and executed lock' : ''} was removed and ${restoredRoles} permission-bearing role(s) were restored.`)
+      .setDescription(`${target} has been absolved. Their nickname lock${executedNick ? ' and executed lock' : ''} was removed and ${restoredRoles} moderation role(s) were restored.`)
       .setTimestamp();
 
     return message.reply({ embeds: [embed] });
