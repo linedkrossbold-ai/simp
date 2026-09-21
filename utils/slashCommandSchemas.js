@@ -1,0 +1,79 @@
+const user = (name, description, required = true) => ({ name, type: 'user', description, required });
+const role = (name, description, required = true) => ({ name, type: 'role', description, required });
+const channel = (name, description, required = false) => ({ name, type: 'channel', description, required });
+const text = (name, description, required = false) => ({ name, type: 'string', description, required });
+const integer = (name, description, required = true, min = null, max = null) => ({ name, type: 'integer', description, required, min, max });
+const number = (name, description, required = true, min = null, max = null) => ({ name, type: 'number', description, required, min, max });
+const choice = (name, description, choices, required = true) => ({ name, type: 'string', description, choices, required });
+const confirm = (name = 'confirm', description = 'Confirm this action', required = true) => ({ name, type: 'boolean', description, required });
+const attachment = (name = 'image', description = 'Image file', required = false) => ({ name, type: 'attachment', description, required });
+
+const schemas = {
+  adminusage: [],
+  chat: [text('message', 'Message to send to the AI chatbot', true)],
+  entry: [text('message', 'Announcement text', false), confirm('fast', 'Skip the dramatic preparation', false), confirm('confetti', 'Add confetti', false), integer('autodelete', 'Delete the announcement after this many seconds', false, 0, 3600)],
+  execute: [user('user', 'Member to put to a vote')],
+  roast: [user('user', 'Member to roast', false)],
+  ping: [user('user', 'Member to watch')],
+  absolve: [user('user', 'Member whose executed nickname lock should be removed')],
+  antinuke: [choice('action', 'Anti-nuke setting to change', ['on', 'off', 'status', 'threshold', 'window', 'action', 'spam', 'mentions', 'joins', 'lockdown']) , text('value', 'Value for the selected setting', false)],
+  backup: [choice('retention', 'How long to keep the backup', ['1', '7', '30', '60', '1h'], false)],
+  ban: [user('user', 'Member to ban'), text('reason', 'Reason for the ban', false)],
+  banall: [text('guild_id', 'ID of the server to ban'), text('reason', 'Reason for the mass ban'), confirm()],
+  bot: [choice('action', 'Bot action', ['enable', 'disable', 'status', 'shutdown'])],
+  coin: [choice('action', 'Coin action', ['enable', 'disable', 'status'])],
+  give: [user('user', 'Member receiving the reward'), choice('type', 'Reward type', ['containers', 'bounty', 'bait']), text('value', 'Bait type or amount'), integer('amount', 'Amount for the reward', false, 1)],
+  givebounty: [user('user', 'Member receiving bounty', false), text('amount', 'Bounty amount, such as 1000, 1.5k, or 2m')],
+  givecoin: [user('user', 'Member receiving coins'), integer('amount', 'Coin amount', true, 1, 500)],
+  givecontainers: [user('user', 'Member receiving containers'), integer('amount', 'Container amount', true, 1)],
+  hazard: [user('user', 'Member to give the Hazardous role')],
+  grantaccess: [user('user', 'Member receiving access'), text('commands', 'Command names separated by commas, or all')],
+  kick: [user('user', 'Member to kick'), text('reason', 'Reason for the kick', false)],
+  leaveserver: [text('guild_id', 'ID of the server to leave'), confirm()],
+  lockchannel: [choice('action', 'Channel action', ['lock', 'unlock', 'status']), channel('channel', 'Channel to manage')],
+  lockdown: [choice('action', 'Lockdown action', ['on', 'off', 'status']), integer('seconds', 'Lockdown duration in seconds', false, 1, 86400)],
+  massban: [text('users', 'User IDs or mentions separated by spaces'), text('reason', 'Reason for the mass ban'), confirm()],
+  mikuset: [choice('action', 'Image protection action', ['setup', 'autorole', 'add', 'list', 'remove', 'logs']), role('role', 'Role to use for autorole', false), integer('id', 'Banned image ID to remove', false, 1), attachment()],
+  mute: [user('user', 'Member to mute'), choice('duration', 'Duration or permanent mute', ['1m', '5m', '10m', '1h', '1d', 'permanent']), text('reason', 'Reason for the mute', false)],
+  noprefix: [choice('action', 'No-prefix mode action', ['enable', 'disable', 'status'])],
+  nuke: [confirm('confirm', 'Confirm deleting every message in this channel'), confirm('fast', 'Use fast mode', false)],
+  paste: [text('template_id', 'Template ID', false), confirm()],
+  reset: [text('guild_id', 'ID of the server to reset'), text('confirmation', 'Type RESET SERVER to confirm')],
+  restore: [text('backup_id', 'Backup ID', false), confirm(), attachment('backup', 'Backup JSON file', false)],
+  revokeaccess: [user('user', 'Member losing access'), text('command', 'Command name or all')],
+  role: [choice('action', 'Role action', ['add', 'remove', 'list']), user('user', 'Member to manage'), role('role', 'Role to add or remove', false)],
+  setnick: [user('user', 'Member whose nickname should be locked'), text('nickname', 'Nickname to set')],
+  setprefix: [text('prefix', 'New bot prefix')],
+  snapshot: [choice('action', 'Snapshot action', ['all', 'withdata', 'load', 'restore']), text('filename', 'Snapshot filename', false)],
+  softban: [user('user', 'Member to softban'), text('reason', 'Reason for the softban', false)],
+  timeout: [user('user', 'Member to timeout'), choice('duration', 'Timeout duration', ['1m', '5m', '10m', '1h', '1d', '1w']), text('reason', 'Reason for the timeout', false)],
+  unmute: [user('user', 'Member to unmute'), text('reason', 'Reason for the unmute', false)],
+  warn: [user('user', 'Member to warn'), text('reason', 'Reason for the warning', false)],
+  warnings: [user('user', 'Member whose warnings should be shown'), integer('limit', 'Maximum warnings to show', false, 1, 100)],
+  copy: [],
+  serverlist: [],
+  baits: [user('user', 'Member whose inventory to view', false)],
+  bounty: [user('user', 'Member whose bounty to view', false)],
+  bountyleaderboard: [integer('limit', 'Number of members to show', false, 1, 25)],
+  catch: [user('user', 'Member to catch')],
+  caught: [],
+  coinflip: [user('user', 'Member to challenge'), integer('amount', 'Coins to wager', true, 1)],
+  coins: [user('user', 'Member whose balance to view', false)],
+  coinhelp: [],
+  coinleaderboard: [],
+  daily: [],
+  dailystreak: [],
+  fish: [],
+  openbait: [choice('amount', 'Number of containers to open', ['1', 'all'], false)],
+  paycoin: [user('user', 'Member receiving coins'), integer('amount', 'Coins to pay', true, 1)],
+  quests: [choice('action', 'Quest action', ['view', 'claim'], false), choice('period', 'Quest period', ['daily', 'weekly'], false), choice('quest', 'Quest type', ['bandit', 'merchant', 'onepiece', 'all'], false)],
+  release: [user('user', 'Member to release', false), confirm('all', 'Release every member you caught')],
+  rizz: [user('user', 'Member receiving the rizz line')],
+  rizzline: [user('user', 'Member receiving the rizz line', false)],
+  roulette: [user('user', 'Member to challenge', false), choice('amount', 'Bounty to wager', ['all'], false), number('bounty', 'Numeric bounty wager', false, 1)],
+  shop: [choice('action', 'Shop action', ['buy']), choice('item', 'Item to buy', ['commonbait', 'uncommonbait', 'rarebait', 'epicbait', 'legendarybait', 'mythicalbait', 'ownerbait', 'container']), integer('amount', 'Amount to buy', false, 1)],
+  usecoin: [choice('amount', 'Coins to spend', ['1', 'all'], false), integer('count', 'Numeric coin amount', false, 1)],
+  sail: []
+};
+
+module.exports = schemas;

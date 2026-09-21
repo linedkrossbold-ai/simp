@@ -1,0 +1,40 @@
+{
+  "name": "simp-discord-bot",
+  "version": "1.0.0",
+  "description": "Discord bot with credit/token and crate system",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "node --test \"tests/*.test.js\"",
+    "postinstall": "node scripts/rebuild-sqlite3-if-linux.js || true"
+  },
+  "keywords": [
+    "discord",
+    "bot",
+    "credits",
+    "tokens",
+    "crates"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^14.26.4",
+    "dotenv": "^17.4.2",
+    "jimp": "^1.6.0",
+    "openai": "^6.45.0",
+    "sqlite3": "^6.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git"
+  },
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/YOUR_USERNAME/YOUR_REPO_NAME/issues"
+  },
+  "homepage": "https://github.com/YOUR_USERNAME/YOUR_REPO_NAME#readme"
+}
