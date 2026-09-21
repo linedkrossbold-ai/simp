@@ -19,6 +19,7 @@ const { validateBotSafetyConfig, getProtectedGuildIds } = require('./utils/safet
 const { findBannedImage, isImageAttachment } = require('./utils/imageBan');
 const { isBotCommandAllowedWhileDisabled, isCoinEconomyEnabled, isCoinCommandAllowedWhileDisabled } = require('./utils/commandAccess');
 const { handleTicketInteraction } = require('./utils/ticketSystem');
+const { startDashboard } = require('./dashboard');
 
 const safetyCheck = validateBotSafetyConfig(process.env);
 if (!safetyCheck.ok) {
@@ -1302,6 +1303,8 @@ if (!tokenResolution.token) {
   console.error(tokenResolution.error);
   process.exit(1);
 }
+
+startDashboard({ client, db });
 
 client.login(tokenResolution.token).catch((error) => {
   if (error?.code === 'TokenInvalid' || error?.message?.includes('TokenInvalid')) {
