@@ -1265,7 +1265,10 @@ client.on('interactionCreate', async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
 
   const command = client.slashCommands.get(interaction.commandName) || client.commands.get(interaction.commandName);
-  if (!command || typeof command.execute !== 'function' || !command.data) return;
+  if (!command || typeof command.execute !== 'function' || !command.data) {
+    await interaction.reply({ content: 'This command is no longer available. Please run the slash-command deployment again.' }).catch(() => {});
+    return;
+  }
 
   if (!client.enabled && !isBotCommandAllowedWhileDisabled(command)) {
     return interaction.reply({ content: '⛔ The bot is currently disabled. Only the bot command can be used.', ephemeral: true }).catch(() => {});
